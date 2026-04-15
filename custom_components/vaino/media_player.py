@@ -34,6 +34,7 @@ SUPPORTED_FEATURES = (
     | MediaPlayerEntityFeature.SHUFFLE_SET
     | MediaPlayerEntityFeature.REPEAT_SET
     | MediaPlayerEntityFeature.BROWSE_MEDIA
+    | MediaPlayerEntityFeature.PLAY_MEDIA
 )
 
 # Map Väinö repeat modes to HA repeat modes
@@ -140,13 +141,18 @@ class VainoMediaPlayer(CoordinatorEntity[VainoDataUpdateCoordinator], MediaPlaye
     @property
     def media_image_url(self) -> str | None:
         track = self.coordinator.data.current_track
-        if track and track.id:
-            return self._client.album_art_url(track.id)
+        if not track:
+            return None
+        if track.album_art_url:
+            # Make absolute if the API returned a relative path
+            if track.album_art_url.startswith("/"):
+                return f"{self._client._base}{track.album_art_url}"
+            return track.album_art_url
         return None
 
     @property
     def media_image_remotely_accessible(self) -> bool:
-        # The Pi is on the local network — HA can proxy it
+        # HA fetches and proxies the image from the Pi
         return False
 
     # ── Shuffle / repeat ──────────────────────────────────────────────────────
