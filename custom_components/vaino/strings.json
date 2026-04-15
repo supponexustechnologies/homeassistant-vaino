@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Väinö",
+        "description": "Enter the IP address or hostname of your Väinö Pi.",
+        "data": {
+          "host": "Host (IP or hostname)",
+          "port": "Port"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to Väinö at that address. Check the host and ensure the Pi is powered on.",
+      "unknown": "Unexpected error — check your HA logs."
+    },
+    "abort": {
+      "already_configured": "This Väinö device is already configured."
+    }
+  }
+}
