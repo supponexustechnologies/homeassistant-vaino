@@ -1,9 +1,21 @@
 """Test fixtures for Väinö integration tests."""
 from __future__ import annotations
 
+import asyncio
+import sys
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
+
+def pytest_configure(config):
+    """Force SelectorEventLoop on Windows before any event loops are created.
+
+    Python 3.12 on Windows defaults to ProactorEventLoop which has a known
+    bug (_ssock AttributeError on cleanup) that breaks pytest-asyncio.
+    """
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 from custom_components.vaino.api import (
     AudioOutput,

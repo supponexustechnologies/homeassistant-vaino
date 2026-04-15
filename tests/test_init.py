@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homeassistant.core import HomeAssistant
-from homeassistant.config_entries import ConfigEntryState
+from homeassistant.config_entries import ConfigEntry
 
 from custom_components.vaino.const import CONF_HOST, CONF_PORT, DEFAULT_PORT, DOMAIN
 
@@ -16,38 +16,45 @@ def auto_enable_custom_integrations(enable_custom_integrations):
 
 
 async def test_setup_entry(hass: HomeAssistant, mock_client) -> None:
-    """Test that a config entry sets up cleanly."""
-    entry = MagicMock()
+    """Test that async_setup_entry stores coordinator and client and forwards platforms."""
+    entry = MagicMock(spec=ConfigEntry)
     entry.entry_id = "test_entry"
     entry.data = {CONF_HOST: "192.168.5.248", CONF_PORT: DEFAULT_PORT}
 
     with (
         patch("custom_components.vaino.VainoApiClient", return_value=mock_client),
-        patch("custom_components.vaino.async_get_clientsession"),
-        patch("custom_components.vaino.hass.config_entries.async_forward_entry_setups", return_value=True),
+        patch("custom_components.vaino.async_get_clientsession", return_value=MagicMock()),
+        patch(
+            "custom_components.vaino.VainoDataUpdateCoordinator.async_config_entry_first_refresh",
+            new_callable=AsyncMock,
+        ),
+        patch(
+            "homeassistant.config_entries.ConfigEntries.async_forward_entry_setups",
+            return_value=True,
+        ),
     ):
         from custom_components.vaino import async_setup_entry
         result = await async_setup_entry(hass, entry)
 
     assert result is True
-    assert DOMAIN in hass.data
+    assert entry.entry_id in hass.data[DOMAIN]
     assert "coordinator" in hass.data[DOMAIN][entry.entry_id]
     assert "client" in hass.data[DOMAIN][entry.entry_id]
 
 
 async def test_unload_entry(hass: HomeAssistant, mock_client) -> None:
-    """Test that a config entry unloads cleanly."""
+    """Test that async_unload_entry removes data and returns True."""
     entry_id = "test_entry_unload"
     hass.data.setdefault(DOMAIN, {})[entry_id] = {
         "coordinator": MagicMock(),
         "client": mock_client,
     }
 
-    entry = MagicMock()
+    entry = MagicMock(spec=ConfigEntry)
     entry.entry_id = entry_id
 
     with patch(
-        "custom_components.vaino.hass.config_entries.async_unload_platforms",
+        "homeassistant.config_entries.ConfigEntries.async_unload_platforms",
         return_value=True,
     ):
         from custom_components.vaino import async_unload_entry

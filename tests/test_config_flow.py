@@ -28,9 +28,12 @@ def auto_enable_custom_integrations(enable_custom_integrations):
 
 async def test_successful_setup(hass: HomeAssistant) -> None:
     """Test the full happy-path config flow."""
-    with patch(
-        "custom_components.vaino.config_flow.validate_host",
-        return_value=MOCK_STATUS.version,
+    with (
+        patch(
+            "custom_components.vaino.config_flow.validate_host",
+            return_value=MOCK_STATUS.version,
+        ),
+        patch("custom_components.vaino.async_setup_entry", return_value=True),
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}
@@ -88,9 +91,12 @@ async def test_unknown_error(hass: HomeAssistant) -> None:
 
 async def test_duplicate_entry_aborted(hass: HomeAssistant) -> None:
     """Test that configuring the same host twice is rejected."""
-    with patch(
-        "custom_components.vaino.config_flow.validate_host",
-        return_value=MOCK_STATUS.version,
+    with (
+        patch(
+            "custom_components.vaino.config_flow.validate_host",
+            return_value=MOCK_STATUS.version,
+        ),
+        patch("custom_components.vaino.async_setup_entry", return_value=True),
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}
