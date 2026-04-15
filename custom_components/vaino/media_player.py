@@ -221,10 +221,150 @@ class VainoMediaPlayer(CoordinatorEntity[VainoDataUpdateCoordinator], MediaPlaye
         media_content_type: str | None = None,
         media_content_id: str | None = None,
     ) -> Any:
-        """Browse the Väinö library — implemented in Phase 3."""
+        """Return a BrowseMedia tree for the Väinö library."""
         from homeassistant.components.media_player import BrowseMedia
+        from homeassistant.components.media_player.const import MediaClass
+
+        content_id = media_content_id or ""
+
+        # ── Root ──────────────────────────────────────────────────
+        if content_id in ("", "library"):
+            return BrowseMedia(
+                title="Väinö",
+                media_class=MediaClass.DIRECTORY,
+                media_content_type=MediaType.MUSIC,
+                media_content_id="library",
+                can_play=False,
+                can_expand=True,
+                children=[
+                    BrowseMedia(
+                        title="Artists",
+                        media_class=MediaClass.DIRECTORY,
+                        media_content_type="artists",
+                        media_content_id="artists",
+                        can_play=False,
+                        can_expand=True,
+                        thumbnail=None,
+                    ),
+                    BrowseMedia(
+                        title="Albums",
+                        media_class=MediaClass.DIRECTORY,
+                        media_content_type="albums",
+                        media_content_id="albums",
+                        can_play=False,
+                        can_expand=True,
+                        thumbnail=None,
+                    ),
+                ],
+            )
+
+        # ── Artists list ──────────────────────────────────────────
+        if content_id == "artists":
+            artists = await self._client.get_artists()
+            children = [
+                BrowseMedia(
+                    title=a.get("name", "Unknown Artist"),
+                    media_class=MediaClass.ARTIST,
+                    media_content_type="artist",
+                    media_content_id=f"artist/{a['id']}",
+                    can_play=True,
+                    can_expand=True,
+                    thumbnail=self._client.artist_art_url(a["id"]),
+                )
+                for a in artists
+            ]
+            return BrowseMedia(
+                title="Artists",
+                media_class=MediaClass.DIRECTORY,
+                media_content_type="artists",
+                media_content_id="artists",
+                can_play=False,
+                can_expand=True,
+                children=children,
+            )
+
+        # ── Albums for an artist ───────────────────────────────────
+        if content_id.startswith("artist/"):
+            artist_id = int(content_id.split("/")[1])
+            albums = await self._client.get_albums(artist_id=artist_id)
+            children = [
+                BrowseMedia(
+                    title=al.get("title", "Unknown Album"),
+                    media_class=MediaClass.ALBUM,
+                    media_content_type="album",
+                    media_content_id=f"album/{al['id']}",
+                    can_play=True,
+                    can_expand=True,
+                    thumbnail=self._client.album_art_url(al["id"]),
+                )
+                for al in albums
+            ]
+            # Use artist name from first album if available
+            artist_name = albums[0].get("artist", "Artist") if albums else "Artist"
+            return BrowseMedia(
+                title=artist_name,
+                media_class=MediaClass.ARTIST,
+                media_content_type="artist",
+                media_content_id=content_id,
+                can_play=True,
+                can_expand=True,
+                children=children,
+            )
+
+        # ── Albums list ───────────────────────────────────────────
+        if content_id == "albums":
+            albums = await self._client.get_albums()
+            children = [
+                BrowseMedia(
+                    title=al.get("title", "Unknown Album"),
+                    media_class=MediaClass.ALBUM,
+                    media_content_type="album",
+                    media_content_id=f"album/{al['id']}",
+                    can_play=True,
+                    can_expand=True,
+                    thumbnail=self._client.album_art_url(al["id"]),
+                )
+                for al in albums
+            ]
+            return BrowseMedia(
+                title="Albums",
+                media_class=MediaClass.DIRECTORY,
+                media_content_type="albums",
+                media_content_id="albums",
+                can_play=False,
+                can_expand=True,
+                children=children,
+            )
+
+        # ── Tracks for an album ───────────────────────────────────
+        if content_id.startswith("album/"):
+            album_id = int(content_id.split("/")[1])
+            tracks = await self._client.get_tracks(album_id=album_id, page_size=500)
+            children = [
+                BrowseMedia(
+                    title=t.get("title", "Unknown Track"),
+                    media_class=MediaClass.TRACK,
+                    media_content_type=MediaType.MUSIC,
+                    media_content_id=f"track/{t['id']}",
+                    can_play=True,
+                    can_expand=False,
+                    thumbnail=self._client.album_art_url(album_id),
+                )
+                for t in tracks
+            ]
+            album_title = tracks[0].get("album", "Album") if tracks else "Album"
+            return BrowseMedia(
+                title=album_title,
+                media_class=MediaClass.ALBUM,
+                media_content_type="album",
+                media_content_id=content_id,
+                can_play=True,
+                can_expand=True,
+                children=children,
+            )
+
         from homeassistant.components.media_player.errors import BrowseError
-        raise BrowseError("Media browsing coming in Phase 3")
+        raise BrowseError(f"Unknown media_content_id: {content_id}")
 
     async def async_play_media(
         self,
@@ -232,5 +372,28 @@ class VainoMediaPlayer(CoordinatorEntity[VainoDataUpdateCoordinator], MediaPlaye
         media_id: str,
         **kwargs: Any,
     ) -> None:
-        """Play media selected from the browser — implemented in Phase 3."""
-        _LOGGER.warning("async_play_media called before Phase 3 is implemented: %s / %s", media_type, media_id)
+        """Play media selected from the browser."""
+        if media_id.startswith("artist/"):
+            artist_id = int(media_id.split("/")[1])
+            await self._client.play_artist(artist_id, shuffle=False)
+
+        elif media_id.startswith("album/"):
+            album_id = int(media_id.split("/")[1])
+            await self._client.play_album(album_id)
+
+        elif media_id.startswith("track/"):
+            track_id = int(media_id.split("/")[1])
+            # Find the track's file path and queue it
+            tracks = await self._client.get_tracks(page_size=1)
+            # Fetch the specific track details
+            track_data = await self._client._get(f"/api/library/tracks/{track_id}")
+            if track_data and track_data.get("filePath"):
+                await self._client._post("/api/queue/clear")
+                await self._client._post("/api/queue/add", {"uri": track_data["filePath"]})
+                await self._client.play_from_queue(0)
+            else:
+                _LOGGER.warning("Could not find filePath for track id %s", track_id)
+        else:
+            _LOGGER.warning("Unhandled media_id in async_play_media: %s", media_id)
+
+        await self.coordinator.async_request_refresh()
