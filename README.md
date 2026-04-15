@@ -1,6 +1,6 @@
 # Väinö — Home Assistant Integration
 
-A [HACS](https://hacs.xyz)-compatible Home Assistant integration for the **Väinö MusicMaster** Pi music player.
+A [HACS](https://hacs.xyz)-compatible Home Assistant integration for the **[Väinö](https://supponexus.com/products/vaino)** Raspberry Pi music player.
 
 Expose your Väinö device as a full-featured Home Assistant media player — browse your library, control playback, switch EQ presets, and trigger automations from a single HA entity.
 
