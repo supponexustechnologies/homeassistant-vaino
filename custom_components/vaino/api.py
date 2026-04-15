@@ -40,6 +40,35 @@ class AudioOutputType(str, Enum):
     BLUETOOTH = "Bluetooth"
 
 
+# C# default JSON serialization sends enums as integers — map them to our string enums
+_PLAYBACK_STATE_MAP: dict[int, PlaybackState] = {
+    0: PlaybackState.STOPPED,
+    1: PlaybackState.PLAYING,
+    2: PlaybackState.PAUSED,
+}
+
+_REPEAT_MODE_MAP: dict[int, RepeatMode] = {
+    0: RepeatMode.OFF,
+    1: RepeatMode.SINGLE,
+    2: RepeatMode.ALL,
+}
+
+_AUDIO_OUTPUT_TYPE_MAP: dict[int, AudioOutputType] = {
+    0: AudioOutputType.HDMI,
+    1: AudioOutputType.ANALOG,
+    2: AudioOutputType.USB_DAC,
+    3: AudioOutputType.AUDIO_HAT,
+    4: AudioOutputType.BLUETOOTH,
+}
+
+
+def _parse_enum(enum_cls: type, int_map: dict, value: Any) -> Any:
+    """Parse an enum value that may be an integer or a string."""
+    if isinstance(value, int):
+        return int_map.get(value, list(int_map.values())[0])
+    return enum_cls(value)
+
+
 # ── Data classes ──────────────────────────────────────────────────────────────
 
 @dataclass
@@ -300,9 +329,9 @@ class VainoApiClient:
                 play_count=t.get("playCount", 0),
             )
         return PlaybackStatus(
-            state=PlaybackState(data["state"]),
+            state=_parse_enum(PlaybackState, _PLAYBACK_STATE_MAP, data["state"]),
             volume=data["volume"],
-            repeat=RepeatMode(data["repeat"]),
+            repeat=_parse_enum(RepeatMode, _REPEAT_MODE_MAP, data["repeat"]),
             shuffle=data["shuffle"],
             position=data.get("position", 0.0),
             duration=data.get("duration", 0.0),
@@ -316,7 +345,7 @@ class VainoApiClient:
         return AudioOutput(
             id=data["id"],
             name=data["name"],
-            type=AudioOutputType(data["type"]),
+            type=_parse_enum(AudioOutputType, _AUDIO_OUTPUT_TYPE_MAP, data["type"]),
             is_enabled=data["isEnabled"],
         )
 
