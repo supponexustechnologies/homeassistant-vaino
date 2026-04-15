@@ -7,6 +7,6 @@
   "issue_tracker": "https://github.com/supponexustechnologies/homeassistant-vaino/issues",
   "requirements": [],
   "dependencies": [],
-  "codeowners": ["@psoup1965"],
+  "codeowners": ["@supponexustechnologies"],
   "iot_class": "local_polling"
 }
