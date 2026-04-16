@@ -1,5 +1,7 @@
 # Väinö — Home Assistant Integration
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+
 A [HACS](https://hacs.xyz)-compatible Home Assistant integration for the **[Väinö](https://supponexus.com/products/vaino)** Raspberry Pi music player.
 
 Expose your Väinö device as a full-featured Home Assistant media player — browse your library, control playback, switch EQ presets, and trigger automations from a single HA entity.
@@ -39,6 +41,8 @@ No API key or authentication required — the integration connects directly to t
 2. Add `supponexustechnologies/homeassistant-vaino` as type **Integration**
 3. Search for **Väinö** and install
 4. Restart Home Assistant
+
+> **Note:** Submission to the HACS default store is in progress. Once accepted, Väinö will be searchable directly in HACS without adding a custom repository.
 
 ### Manual
 
@@ -124,43 +128,43 @@ Key endpoints used:
 
 ## Implementation Plan
 
-### Phase 1 — Foundation (current)
+### Phase 1 — Foundation ✅
 - [x] Project structure and documentation
-- [ ] `api.py` — async HTTP client wrapping MusicMaster API
-- [ ] `config_flow.py` — UI setup: enter host, test connection, save entry
-- [ ] `__init__.py` — integration entry point, coordinator setup
-- [ ] `const.py` — constants (domain, default port, polling interval)
-- [ ] `manifest.json` and `hacs.json`
+- [x] `api.py` — async HTTP client wrapping MusicMaster API
+- [x] `config_flow.py` — UI setup: enter host, test connection, save entry
+- [x] `__init__.py` — integration entry point, coordinator setup
+- [x] `const.py` — constants (domain, default port, polling interval)
+- [x] `manifest.json` and `hacs.json`
 
-### Phase 2 — Core Entity
-- [ ] `media_player.py` — full `MediaPlayerEntity` implementation
+### Phase 2 — Core Entity ✅
+- [x] `media_player.py` — full `MediaPlayerEntity` implementation
   - State: playing / paused / idle / off
   - Transport: play, pause, stop, next, previous
   - Volume: get and set
   - Seek: get position, set position
   - Shuffle and repeat modes
   - Now playing: title, artist, album, duration
-  - Album art: serve via `GET /api/art/album/{id}`
+  - Album art via `GET /api/art/album/{id}`
   - Polling via `DataUpdateCoordinator` (5-second interval)
 
-### Phase 3 — Media Browser
-- [ ] Implement `async_browse_media()` on the media player
-  - Root: Artists / Albums / Playlists
+### Phase 3 — Media Browser ✅
+- [x] `async_browse_media()` on the media player
+  - Root: Artists / Albums
   - Artists → Albums → Tracks
   - Thumbnails from `/api/art/artist/{id}` and `/api/art/album/{id}`
   - Play from browser: queue track/album/artist
 
-### Phase 4 — Supporting Entities
-- [ ] `select.py` — EQ preset selector, audio output selector
-- [ ] `sensor.py` — library track / artist / album counts
-- [ ] `button.py` — scan library, reboot
+### Phase 4 — Supporting Entities ✅
+- [x] `select.py` — EQ preset selector, audio output selector
+- [x] `sensor.py` — library track / artist / album counts
+- [x] `button.py` — scan library, reboot
 
-### Phase 5 — Polish and HACS Submission
-- [ ] `strings.json` and `translations/en.json` — UI text
-- [ ] Icons and brand assets (logo 256x256, icon 256x256)
-- [ ] `tests/` — basic unit tests for the API client and coordinator
-- [ ] Submit to [HACS default repository](https://github.com/hacs/default)
-- [ ] Publish to `supponexustechnologies/homeassistant-vaino` GitHub repo
+### Phase 5 — Polish and HACS Submission ✅
+- [x] `strings.json` and `translations/en.json` — UI text
+- [x] Icons and brand assets (icon 512x512, logo)
+- [x] `tests/` — 59 unit tests across API client, config flow, media player, and init
+- [x] Published to `supponexustechnologies/homeassistant-vaino` GitHub repo
+- [ ] Submit to [HACS default repository](https://github.com/hacs/default) — in progress
 
 ---
 
