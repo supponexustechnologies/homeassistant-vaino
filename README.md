@@ -1,8 +1,8 @@
 # Väinö — Home Assistant Integration
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![Hassfest](https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/hassfest.yaml)
-[![HACS Validation](https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/validate.yaml/badge.svg)](https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/validate.yaml)
+[![Hassfest](https://img.shields.io/github/actions/workflow/status/supponexustechnologies/homeassistant-vaino/hassfest.yaml?label=Hassfest&logo=homeassistant)](https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/hassfest.yaml)
+[![HACS Validation](https://img.shields.io/github/actions/workflow/status/supponexustechnologies/homeassistant-vaino/validate.yaml?label=HACS%20Validation&logo=homeassistant)](https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/validate.yaml)
 
 A [HACS](https://hacs.xyz)-compatible Home Assistant integration for the **[Väinö](https://supponexus.com/products/vaino)** Raspberry Pi music player.
 
