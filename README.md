@@ -1,8 +1,12 @@
 # Väinö — Home Assistant Integration
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![Hassfest](https://img.shields.io/github/actions/workflow/status/supponexustechnologies/homeassistant-vaino/hassfest.yaml?label=Hassfest&logo=homeassistant)](https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/hassfest.yaml)
-[![HACS Validation](https://img.shields.io/github/actions/workflow/status/supponexustechnologies/homeassistant-vaino/validate.yaml?label=HACS%20Validation&logo=homeassistant)](https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/validate.yaml)
+[![HACS][hacs-badge]][hacs-url]
+[![GitHub Release][release-badge]][release-url]
+[![Hassfest][hassfest-badge]][hassfest-url]
+[![HACS Validation][hacs-validate-badge]][hacs-validate-url]
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=supponexustechnologies&repository=homeassistant-vaino&category=Integration)
+[![Add integration to My Home Assistant](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=vaino)
 
 A [HACS](https://hacs.xyz)-compatible Home Assistant integration for the **[Väinö](https://supponexus.com/products/vaino)** Raspberry Pi music player.
 
@@ -217,3 +221,12 @@ cp -r custom_components/vaino /path/to/ha/config/custom_components/
 
 This integration is maintained by [SuppoNexus Technologies](https://supponexus.com).
 Issues and pull requests welcome.
+
+[hacs-badge]: https://img.shields.io/badge/HACS-Custom-orange.svg
+[hacs-url]: https://github.com/hacs/integration
+[release-badge]: https://img.shields.io/github/v/release/supponexustechnologies/homeassistant-vaino
+[release-url]: https://github.com/supponexustechnologies/homeassistant-vaino/releases
+[hassfest-badge]: https://img.shields.io/github/actions/workflow/status/supponexustechnologies/homeassistant-vaino/hassfest.yaml?label=Hassfest&logo=homeassistant
+[hassfest-url]: https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/hassfest.yaml
+[hacs-validate-badge]: https://img.shields.io/github/actions/workflow/status/supponexustechnologies/homeassistant-vaino/validate.yaml?label=HACS%20Validation&logo=homeassistant
+[hacs-validate-url]: https://github.com/supponexustechnologies/homeassistant-vaino/actions/workflows/validate.yaml
