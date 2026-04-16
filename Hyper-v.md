@@ -19,3 +19,29 @@
 
   ---
   Go to home-assistant.io/installation/windows and grab the Hyper-V image. Once it's running and you've completed the onboarding, come back and we'll wire up the dev workflow.
+
+
+
+  ● Yes — Phase 5 needs a running HA instance to:
+
+  - Verify the integration loads without errors                                                                                                                                                                                                - Test the config flow UI end-to-end
+  - Confirm all entities appear correctly under the Väinö device                                                                                                                                                                               - Catch any import or runtime errors before HACS submission
+
+  HACS reviewers will reject integrations that don't load cleanly, so we want to shake out any issues before submitting.
+
+  Go ahead and reboot. Once HAOS is up and you've completed the initial HA onboarding, come back and we'll:
+
+  1. Copy custom_components/vaino/ into the HA config directory
+  2. Add the integration via the UI
+  3. Point it at your Väinö Pi
+  4. Fix anything that surfaces
+  5. Then write the tests and submit to HACS
+
+
+  claude --resume fb7912fb-296c-4f83-aef5-db2c85d3bf49 --dangerously-skip-permissions
+
+  
+  
+  HAOS IP: 192.168.5.250
+  
+http://haos-viano.local:8123
