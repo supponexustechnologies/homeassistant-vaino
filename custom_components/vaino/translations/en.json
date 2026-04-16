@@ -8,6 +8,10 @@
           "host": "Host (IP or hostname)",
           "port": "Port"
         }
+      },
+      "confirm": {
+        "title": "Väinö Discovered",
+        "description": "A Väinö device was found at `{host}`. Do you want to add it?"
       }
     },
     "error": {
@@ -15,7 +19,9 @@
       "unknown": "Unexpected error — check your HA logs."
     },
     "abort": {
-      "already_configured": "This Väinö device is already configured."
+      "already_configured": "This Väinö device is already configured.",
+      "cannot_connect": "Could not connect to the discovered Väinö device.",
+      "unknown": "Unexpected error during discovery."
     }
   }
 }

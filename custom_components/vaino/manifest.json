@@ -1,12 +1,13 @@
 {
   "domain": "vaino",
   "name": "Väinö MusicMaster",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "config_flow": true,
   "documentation": "https://github.com/supponexustechnologies/homeassistant-vaino",
   "issue_tracker": "https://github.com/supponexustechnologies/homeassistant-vaino/issues",
   "requirements": [],
   "dependencies": [],
-  "codeowners": ["@supponexustechnologies"],
-  "iot_class": "local_polling"
+  "codeowners": ["@SuppoNexusTechnologies"],
+  "iot_class": "local_polling",
+  "zeroconf": ["_vaino._tcp.local."]
 }

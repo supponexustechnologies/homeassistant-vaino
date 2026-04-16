@@ -4,6 +4,7 @@ from __future__ import annotations
 import voluptuous as vol
 
 from homeassistant import config_entries
+from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 
@@ -30,16 +31,20 @@ class VainoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    def __init__(self) -> None:
+        self._host: str | None = None
+        self._port: int = DEFAULT_PORT
+
     async def async_step_user(
         self, user_input: dict | None = None
     ) -> FlowResult:
+        """Manual setup — user enters host and port."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
             host = user_input[CONF_HOST].strip()
             port = user_input.get(CONF_PORT, DEFAULT_PORT)
 
-            # Prevent duplicate entries for the same device
             await self.async_set_unique_id(f"vaino_{host}_{port}")
             self._abort_if_unique_id_configured()
 
@@ -61,4 +66,41 @@ class VainoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user",
             data_schema=DATA_SCHEMA,
             errors=errors,
+        )
+
+    async def async_step_zeroconf(
+        self, discovery_info: ZeroconfServiceInfo
+    ) -> FlowResult:
+        """Handle auto-discovery via Avahi/zeroconf."""
+        host = discovery_info.host
+        port = discovery_info.port or DEFAULT_PORT
+
+        await self.async_set_unique_id(f"vaino_{host}_{port}")
+        self._abort_if_unique_id_configured()
+
+        try:
+            await validate_host(self.hass, host, port)
+        except CannotConnect:
+            return self.async_abort(reason="cannot_connect")
+        except Exception:  # noqa: BLE001
+            return self.async_abort(reason="unknown")
+
+        self._host = host
+        self._port = port
+        self.context["title_placeholders"] = {"host": host}
+        return await self.async_step_confirm()
+
+    async def async_step_confirm(
+        self, user_input: dict | None = None
+    ) -> FlowResult:
+        """Confirm auto-discovered device before creating the entry."""
+        if user_input is not None:
+            return self.async_create_entry(
+                title=DEFAULT_NAME,
+                data={CONF_HOST: self._host, CONF_PORT: self._port},
+            )
+
+        return self.async_show_form(
+            step_id="confirm",
+            description_placeholders={"host": self._host},
         )

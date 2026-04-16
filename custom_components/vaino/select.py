@@ -57,11 +57,15 @@ class VainoEqPresetSelect(SelectEntity):
             self._attr_options = list(self._presets.keys())
 
             # Reflect the last-used preset as the current selection
-            data = await self._client._get("/api/equalizer/presets/last-used")
-            if data and data.get("name") in self._presets:
-                self._attr_current_option = data["name"]
-            elif self._attr_options:
-                self._attr_current_option = self._attr_options[0]
+            try:
+                data = await self._client._get("/api/equalizer/presets/last-used")
+                if data and data.get("name") in self._presets:
+                    self._attr_current_option = data["name"]
+                else:
+                    self._attr_current_option = self._attr_options[0] if self._attr_options else None
+            except Exception:
+                # 204 No Content or any error — default to first preset
+                self._attr_current_option = self._attr_options[0] if self._attr_options else None
         except VainoApiError as err:
             _LOGGER.warning("Could not fetch EQ presets: %s", err)
 
